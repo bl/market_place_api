@@ -18,6 +18,9 @@ gem 'coffee-rails', '~> 4.1.0'
 # devise authentication
 gem 'devise'
 
+# Use puma for routing
+gem 'puma'
+
 # See https://github.com/sstephenson/execjs#readme for more supported runtimes
 # gem 'therubyracer', platforms: :ruby
 
