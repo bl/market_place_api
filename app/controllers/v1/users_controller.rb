@@ -29,6 +29,16 @@ class V1::UsersController < ApplicationController
     end
   end
 
+  def destroy
+    @user = User.find_by(id: params[:id])
+    if @user
+      @user.destroy
+      head 204
+    else
+      render json: { errors: 'not found' }, status: 422
+    end
+  end
+
   private
 
     def user_params

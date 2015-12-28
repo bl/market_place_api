@@ -70,7 +70,7 @@ class V1::UsersControllerTest < ActionController::TestCase
   
   test "returns information about valid updated user" do
     update_user = { email: "new@example.com" }
-    patch :update, { id: @user.id, user: update_user } , format: :json
+    patch :update, { id: @user, user: update_user } , format: :json
     user_response = JSON.parse response.body, symbolize_names: true
     assert_not_nil user_response[:email]
     assert_equal "new@example.com", user_response[:email].to_s
@@ -80,7 +80,7 @@ class V1::UsersControllerTest < ActionController::TestCase
 
   test "returns json errors on invalid email update attempt" do
     update_user = { email: "invalid.com" }
-    patch :update, { id: @user.id, user: update_user }, format: :json
+    patch :update, { id: @user, user: update_user }, format: :json
     user_response = JSON.parse response.body, symbolize_names: true
     assert_not_nil user_response[:errors]
     user_errors = user_response[:errors]
@@ -101,5 +101,23 @@ class V1::UsersControllerTest < ActionController::TestCase
 
   # REMOVE
   
+  test "returns confirmation on valid user deletion" do
+    assert_difference 'User.count', -1 do
+      delete :destroy, { id: @user }, format: :json
+    end 
 
+    assert_response 204
+  end
+
+  test "returns errors on invalid user id deletion" do
+    assert_no_difference 'User.count' do
+      delete :destroy, { id: -1 }, format: :json
+    end 
+    user_response = JSON.parse response.body, symbolize_names: true
+    assert_not_nil user_response[:errors]
+    user_errors = user_response[:errors]
+    assert_match /not found/, user_response[:errors].to_s
+
+    assert_response 422
+  end
 end
