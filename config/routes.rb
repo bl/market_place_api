@@ -9,7 +9,7 @@ MarketPlaceApi::Application.routes.draw do
         defaults: { format: :json },
         constraints: ApiConstraints.new(version: 1, default: true) do
     # We are going to list our resources here
-    resources :users, :only => [:show, :create, :update, :destroy]
+    resources :users, :only => [:show, :create, :update, :destroy]#, constraints: ApiConstraints.new(version: 1, default: true)
   end
 
 #  end

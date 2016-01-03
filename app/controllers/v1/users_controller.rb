@@ -2,7 +2,7 @@ class V1::UsersController < ApplicationController
   respond_to :json
 
   def show
-    @user = User.find(params[:id])
+    @user = User.find_by(id: params[:id])
     render json: @user
     #respond_with User.find(params[:id])
   end

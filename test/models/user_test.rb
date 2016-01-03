@@ -53,4 +53,7 @@ class UserTest < ActiveSupport::TestCase
     @user.password_confirmation = ""
     assert_not @user.valid?
   end
+
+  test "should have authentication token" do
+  end
 end

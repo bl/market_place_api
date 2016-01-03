@@ -1,3 +1,5 @@
+require 'test_helper'
+
 class V1::UsersControllerTest < ActionController::TestCase
 
   def setup
@@ -21,8 +23,8 @@ class V1::UsersControllerTest < ActionController::TestCase
 
   test "renders json errors on invalid email" do
     invalid_user = { email: "invalid_email",
-             password:              "foobar",
-             password_confirmation: "foobar" }
+                     password:              "foobar",
+                     password_confirmation: "foobar" }
     post :create, user: invalid_user, format: :json
     user_response = JSON.parse response.body, symbolize_names: true
     assert_not_nil user_response[:errors]
