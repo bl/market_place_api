@@ -1,5 +1,5 @@
 class User < ActiveRecord::Base
-  before_create :create_auth_token
+  before_create :create_auth_token!
   before_save   :downcase_email
 
   # valid e-mail regex
@@ -31,6 +31,13 @@ class User < ActiveRecord::Base
     BCrypt::Password.new(digest).is_password?(token)
   end
 
+  # set auth_token to new token
+  def create_auth_token!
+    begin
+      self.auth_token = User.new_token
+    end while self.class.exists?(auth_token: auth_token)
+  end
+
   private
 
     # set email to downcase
@@ -38,10 +45,4 @@ class User < ActiveRecord::Base
       self.email = self.email.downcase
     end
 
-    # set auth token
-    def create_auth_token
-      begin
-        self.auth_token = User.new_token
-      end while self.class.exists?(auth_token: auth_token)
-    end
 end

@@ -28,6 +28,7 @@ class V1::UsersController < ApplicationController
     end
   end
 
+  # TODO: destroy only on properly authenticated user
   def destroy
     @user = User.find_by(id: params[:id])
     if @user
