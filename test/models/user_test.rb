@@ -21,6 +21,14 @@ class UserTest < ActiveSupport::TestCase
   test "email should be case in-sensitive" do
     @user.email = "ExAMPLE@EmaIL.com"
     @user.save
+    duplicate_user = @user.dup
+    duplicate_user.email.downcase!
+    assert_not duplicate_user.valid?
+  end
+
+  test "email should be lowercase on save" do
+    @user.email = "ExAMPLE@EmaIL.com"
+    @user.save
     assert @user.valid?
     @user.reload.email == "exampale@email.com"
   end
@@ -55,18 +63,30 @@ class UserTest < ActiveSupport::TestCase
     assert_not @user.valid?
   end
 
+  test "valid password should be authenticated" do
+    assert @user.authenticated? :password, "12345678"
+    assert_not @user.authenticated? :password, "123456789"
+    @user.password_digest = nil
+    assert_not @user.authenticated? :password, "12345678"
+
+    # verify User.digest mimicks internal has_secure_password
+    @user.password_digest = User.digest("12345678")
+    assert @user.authenticated? :password, "12345678"
+  end
+
   test "should accept valid authentication token" do
     @user.auth_token = :auth_token
     assert @user.valid?
   end
 
   test "auth_token should be unique" do
-    @user.auth_token = 'AUTH_TOKEN'
-    @user.save
-    duplicate_user = @user.dup
+    user_params = { email: "firstuser@example.com", 
+                   password: "foobar" }
+    first_user = User.create user_params
+    duplicate_user = first_user.dup
     duplicate_user.email = "unique@email.com"
     assert_not duplicate_user.valid?
-    duplicate_user.auth_token = @user.auth_token.downcase
+    duplicate_user.auth_token = User.new_token
     assert duplicate_user.valid?
   end
 
@@ -76,15 +96,14 @@ class UserTest < ActiveSupport::TestCase
     assert_not_nil new_user.auth_token
   end
 
+  # TODO: look into reliable method of replicating token conflicts
   test "auth_token should be regenerated on conflict" do
     user_params = { email: "firstuser@example.com", 
-                   password: "foobar", 
-                   auth_token: "new_auth_token" }
+                   password: "foobar" }
     first_user = User.create user_params
     assert first_user.valid?
     user_params[:email] = "seconduser@example.com"
     second_user = User.create user_params
-    #second_user.errors.each {|k, v| puts "#{k}, #{v}"}
     assert second_user.valid?
     assert_not_equal first_user.auth_token, second_user.auth_token
   end

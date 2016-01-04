@@ -11,20 +11,27 @@ class User < ActiveRecord::Base
   validates :password, presence: true, allow_nil: true
   validates :auth_token, uniqueness: true
 
+  # generate base64 url-safe string
+  def User.new_token
+    SecureRandom.urlsafe_base64
+  end
+
+  # generate bcrypt digest from input string
+  # TODO: look into User.digest creating unique digests on each call with same token
+  def User.digest(input)
+    cost = ActiveModel::SecurePassword.min_cost ? BCrypt::Engine::MIN_COST :
+                                                  BCrypt::Engine.cost
+    BCrypt::Password.create(input, cost: cost)
+  end
+
+  # verify authenticated user attribute
+  def authenticated?(attribute, token)
+    digest = self.send("#{attribute}_digest")
+    return false if digest.nil?
+    BCrypt::Password.new(digest).is_password?(token)
+  end
+
   private
-
-    # generate base64 url-safe string
-    def User.new_token
-      SecureRandom.urlsafe_base64
-    end
-
-    # generate bcrypt digest from input string
-    # TODO: look into User.digest creating unique digests on each call with same token
-    def User.digest(input)
-      cost = ActiveModel::SecurePassword.min_cost ? BCrypt::Engine::MIN_COST :
-                                                    BCrypt::Engine.cost
-      BCrypt::Password.create(string: input, cost: cost)
-    end
 
     # set email to downcase
     def downcase_email
@@ -32,11 +39,9 @@ class User < ActiveRecord::Base
     end
 
     # set auth token
-    # TODO: resolve conflict on duplicate tokens
     def create_auth_token
-      #begin
-        new_token = self.auth_token || User.new_token
-        self.auth_token = User.digest(new_token)
-      #end while self.class.exists?(auth_token: auth_token)
+      begin
+        self.auth_token = User.new_token
+      end while self.class.exists?(auth_token: auth_token)
     end
 end
