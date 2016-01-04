@@ -1,5 +1,6 @@
 class User < ActiveRecord::Base
-  before_save :downcase_email
+  before_create :create_auth_token
+  before_save   :downcase_email
 
   # valid e-mail regex
   VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-]+(\.[a-z\d\-]+)*\.[a-z]+\z/i
@@ -8,9 +9,34 @@ class User < ActiveRecord::Base
                     format: { with: VALID_EMAIL_REGEX }
   has_secure_password
   validates :password, presence: true, allow_nil: true
+  validates :auth_token, uniqueness: true
 
   private
+
+    # generate base64 url-safe string
+    def User.new_token
+      SecureRandom.urlsafe_base64
+    end
+
+    # generate bcrypt digest from input string
+    # TODO: look into User.digest creating unique digests on each call with same token
+    def User.digest(input)
+      cost = ActiveModel::SecurePassword.min_cost ? BCrypt::Engine::MIN_COST :
+                                                    BCrypt::Engine.cost
+      BCrypt::Password.create(string: input, cost: cost)
+    end
+
+    # set email to downcase
     def downcase_email
       self.email = self.email.downcase
+    end
+
+    # set auth token
+    # TODO: resolve conflict on duplicate tokens
+    def create_auth_token
+      #begin
+        new_token = self.auth_token || User.new_token
+        self.auth_token = User.digest(new_token)
+      #end while self.class.exists?(auth_token: auth_token)
     end
 end

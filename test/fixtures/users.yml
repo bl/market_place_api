@@ -7,6 +7,8 @@
 one:
   email: test@chris.com
   password_digest: foobar
+  auth_token: <%= User.digest(User.new_token) %>
 two:
   email: jimmy@carter.com
   password_digest: foobar
+  auth_token: <%= User.digest(User.new_token) %>

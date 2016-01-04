@@ -4,7 +4,6 @@ class V1::UsersController < ApplicationController
   def show
     @user = User.find_by(id: params[:id])
     render json: @user
-    #respond_with User.find(params[:id])
   end
 
   def create
