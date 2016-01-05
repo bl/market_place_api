@@ -2,7 +2,7 @@ class User < ActiveRecord::Base
   before_create :create_auth_token!
   before_save   :downcase_email
 
-  has_many :products
+  has_many :products, dependent: :destroy
 
   # valid e-mail regex
   VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-]+(\.[a-z\d\-]+)*\.[a-z]+\z/i

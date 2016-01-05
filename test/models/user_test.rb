@@ -111,4 +111,13 @@ class UserTest < ActiveSupport::TestCase
   test "user should have associated products" do
     assert @user.respond_to?(:products)
   end
+
+  test "dependent products should be destroyed on user destroy" do
+    user = FactoryGirl.create :user_with_products
+    products = user.products
+    user.destroy
+    products.each do |product|
+      assert_not Product.find_by id: product.id
+    end
+  end
 end
