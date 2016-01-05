@@ -8,6 +8,28 @@ Minitest::Reporters.use!
 class ActiveSupport::TestCase
   fixtures :all
 
+  def get_session_for(user, options = {})
+    password = options[:password] || 'foobar'
+    if integration_test?
+      post sessions_path, session: { email:     user.email,
+                                     password:  password }
+      user_attr = JSON.parse response.body, symbolize_names: true 
+      user_attr[:auth_token]
+    else
+      user.create_auth_token!
+      user.save
+      user.auth_token
+    end
+  end
+
+  def log_in_as(user, options = {})
+     api_authorization_header(get_session_for(user, options))
+  end
+
+  def api_authorization_header(token)
+    request.headers['Authorization'] = token
+  end
+
   def api_header(version = 1)
     api_version = "application/vnd.marketplace.v#{version}"
     request.headers['Accept'] = api_version
@@ -21,5 +43,10 @@ class ActiveSupport::TestCase
   def include_default_accept_headers
     api_header
     api_response_format
+  end
+
+  # returns true inside of an integration test
+  def integration_test?
+    defined?(post_via_redirect)
   end
 end

@@ -5,4 +5,6 @@ class ApplicationController < ActionController::Base
   # For APIs, you may want to use :null_session instead.
   # not needed, as no cookie based sesions used
   #protect_from_forgery with: :exception
+
+  include Authenticable
 end
