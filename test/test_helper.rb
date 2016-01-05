@@ -6,7 +6,9 @@ Minitest::Reporters.use!
 
 # Add more helper methods to be used by all tests here...
 class ActiveSupport::TestCase
-  fixtures :all
+  #fixtures :all
+
+  include FactoryGirl::Syntax::Methods
 
   def get_session_for(user, options = {})
     password = options[:password] || 'foobar'

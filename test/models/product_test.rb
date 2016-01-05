@@ -41,4 +41,8 @@ class ProductTest < ActiveSupport::TestCase
     @product.price = nil
     assert_not @product.valid?
   end
+
+  test "product should belong to a user" do
+    assert @product.respond_to?(:user)
+  end
 end

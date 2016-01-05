@@ -3,7 +3,7 @@ require 'test_helper'
 class V1::SessionsControllerTest < ActionController::TestCase
 
   def setup
-    @user = users(:one)
+    @user = FactoryGirl.create :user
   end
 
   #POST

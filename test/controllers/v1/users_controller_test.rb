@@ -3,8 +3,8 @@ require 'test_helper'
 class V1::UsersControllerTest < ActionController::TestCase
 
   def setup
-    @user = users(:one)
-    @other_user = users(:two)
+    @user = FactoryGirl.create :user
+    @other_user = FactoryGirl.create :user
     # set header to include api version 1 request
     api_version = "application/vnd.marketplace.v1"
     request.headers['Accept'] = api_version

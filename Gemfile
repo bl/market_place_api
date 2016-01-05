@@ -38,6 +38,11 @@ gem 'responders', '~> 2.0'
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug'
+
+  gem 'factory_girl_rails'
+
+  gem 'ffaker'
+
 end
 
 group :development do
@@ -46,8 +51,6 @@ group :development do
   gem 'minitest-reporters', '1.0.5'
   gem 'mini_backtrace',     '0.1.3'
   gem 'guard-minitest',     '2.3.1'
-
-  gem 'ffaker'
 
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   #gem 'spring'

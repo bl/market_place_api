@@ -107,4 +107,8 @@ class UserTest < ActiveSupport::TestCase
     assert second_user.valid?
     assert_not_equal first_user.auth_token, second_user.auth_token
   end
+
+  test "user should have associated products" do
+    assert @user.respond_to?(:products)
+  end
 end
