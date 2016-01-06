@@ -15,13 +15,17 @@ class ActiveSupport::TestCase
     if integration_test?
       post sessions_path, session: { email:     user.email,
                                      password:  password }
-      user_attr = JSON.parse response.body, symbolize_names: true 
+      user_attr = json_response
       user_attr[:auth_token]
     else
       user.create_auth_token!
       user.save
       user.auth_token
     end
+  end
+
+  def json_response
+    JSON.parse response.body, symbolize_names: true
   end
 
   def log_in_as(user, options = {})

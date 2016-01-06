@@ -14,7 +14,7 @@ class V1::UsersControllerTest < ActionController::TestCase
 
   test "returns information about a reporter on a hash" do
     get :show, id: @user, format: :json
-    user_response = JSON.parse response.body, symbolize_names: true
+    user_response = json_response
     assert_equal @user.email, user_response[:email]
     # assert_equal 200, response.status
     assert_response 200
@@ -27,7 +27,7 @@ class V1::UsersControllerTest < ActionController::TestCase
                      password:              "foobar",
                      password_confirmation: "foobar" }
     post :create, user: invalid_user, format: :json
-    user_response = JSON.parse response.body, symbolize_names: true
+    user_response = json_response
     assert_not_nil user_response[:errors]
     user_errors = user_response[:errors]
     assert_match /is invalid/, user_errors[:email].to_s
@@ -38,7 +38,7 @@ class V1::UsersControllerTest < ActionController::TestCase
     invalid_user_attributes = { password:               "foobar",
                                 password_confirmation:  "foobar" }
     post :create, user: invalid_user_attributes, format: :json
-    user_response = JSON.parse response.body, symbolize_names: true
+    user_response = json_response
     assert_not_nil user_response[:errors]
     user_errors = user_response[:errors]
     assert_match /can't be blank/, user_errors[:email].to_s
@@ -50,7 +50,7 @@ class V1::UsersControllerTest < ActionController::TestCase
              password:              "",
              password_confirmation: "foobar" }
     post :create, user: invalid_user, format: :json
-    user_response = JSON.parse response.body, symbolize_names: true
+    user_response = json_response
     assert_not_nil user_response[:errors]
     user_errors = user_response[:errors]
     assert_match /can't be blank/, user_errors[:password].to_s
@@ -62,7 +62,7 @@ class V1::UsersControllerTest < ActionController::TestCase
              password:              "foobar",
              password_confirmation: "foobaz" }
     post :create, user: invalid_user, format: :json
-    user_response = JSON.parse response.body, symbolize_names: true
+    user_response = json_response
     assert_not_nil user_response[:errors]
     user_errors = user_response[:errors]
     assert_match /doesn't match Password/, user_errors[:password_confirmation].to_s
@@ -73,7 +73,7 @@ class V1::UsersControllerTest < ActionController::TestCase
   test "returns json errors when not logged in" do
     update_user = { email: "new@example.com" }
     patch :update, { id: @user, user: update_user } , format: :json
-    user_response = JSON.parse response.body, symbolize_names: true
+    user_response = json_response
     assert_not_nil user_response[:errors]
     assert_match /Not authenticated/, user_response[:errors].to_s
 
@@ -84,7 +84,7 @@ class V1::UsersControllerTest < ActionController::TestCase
     log_in_as @user
     update_user = { email: "new@example.com" }
     patch :update, { id: @user, user: update_user } , format: :json
-    user_response = JSON.parse response.body, symbolize_names: true
+    user_response = json_response
     assert_not_nil user_response[:email]
     assert_equal "new@example.com", user_response[:email].to_s
 
@@ -95,7 +95,7 @@ class V1::UsersControllerTest < ActionController::TestCase
     log_in_as @user
     update_user = { email: "invalid.com" }
     patch :update, { id: @user, user: update_user }, format: :json
-    user_response = JSON.parse response.body, symbolize_names: true
+    user_response = json_response
     assert_not_nil user_response[:errors]
     user_errors = user_response[:errors]
     assert_match /is invalid/, user_errors[:email].to_s
@@ -107,7 +107,7 @@ class V1::UsersControllerTest < ActionController::TestCase
     log_in_as @user
     update_user = { email: "test@valid.com" }
     patch :update, { id: @other_user.id, user: update_user }, format: :json
-    user_response = JSON.parse response.body, symbolize_names: true
+    user_response = json_response
     assert_not_nil user_response[:errors]
     assert_match /Incorrect user/, user_response[:errors].to_s
 
@@ -118,7 +118,7 @@ class V1::UsersControllerTest < ActionController::TestCase
     log_in_as @user
     update_user = { email: "test@valid.com" }
     patch :update, { id: -1, user: update_user }, format: :json
-    user_response = JSON.parse response.body, symbolize_names: true
+    user_response = json_response
     assert_not_nil user_response[:errors]
     assert_match /Incorrect user/, user_response[:errors].to_s
 
@@ -131,7 +131,7 @@ class V1::UsersControllerTest < ActionController::TestCase
     assert_no_difference 'User.count' do
       delete :destroy, { id: @user }, format: :json
     end 
-    user_response = JSON.parse response.body, symbolize_names: true
+    user_response = json_response
     assert_not_nil user_response[:errors]
     user_errors = user_response[:errors]
     assert_match /Not authenticated/, user_response[:errors].to_s
@@ -154,7 +154,7 @@ class V1::UsersControllerTest < ActionController::TestCase
     assert_no_difference 'User.count' do
       delete :destroy, { id: @other_user.id }, format: :json
     end 
-    user_response = JSON.parse response.body, symbolize_names: true
+    user_response = json_response
     assert_not_nil user_response[:errors]
     user_errors = user_response[:errors]
     assert_match /Incorrect user/, user_response[:errors].to_s
@@ -167,7 +167,7 @@ class V1::UsersControllerTest < ActionController::TestCase
     assert_no_difference 'User.count' do
       delete :destroy, { id: -1 }, format: :json
     end 
-    user_response = JSON.parse response.body, symbolize_names: true
+    user_response = json_response
     assert_not_nil user_response[:errors]
     user_errors = user_response[:errors]
     assert_match /Incorrect user/, user_response[:errors].to_s
