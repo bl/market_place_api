@@ -14,7 +14,7 @@ class V1::UsersControllerTest < ActionController::TestCase
 
   test "returns information about a reporter on a hash" do
     get :show, id: @user, format: :json
-    user_response = json_response
+    user_response = json_response[:user]
     assert_equal @user.email, user_response[:email]
     # assert_equal 200, response.status
     assert_response 200
@@ -84,7 +84,7 @@ class V1::UsersControllerTest < ActionController::TestCase
     log_in_as @user
     update_user = { email: "new@example.com" }
     patch :update, { id: @user, user: update_user } , format: :json
-    user_response = json_response
+    user_response = json_response[:user]
     assert_not_nil user_response[:email]
     assert_equal "new@example.com", user_response[:email].to_s
 
