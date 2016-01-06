@@ -16,6 +16,16 @@ class V1::ProductsControllerTest < ActionController::TestCase
     assert_response 200
   end
 
+  test "product json response also contains user" do
+    get :show, id: @product, format: :json
+    product_response = json_response[:product]
+    product_user = product_response[:user]
+    assert_not_nil product_user
+    assert_equal @product.user.id, product_user[:id]
+
+    assert_response 200
+  end
+
   # INDEX
 
   test "index returns the information of all products" do
@@ -24,8 +34,11 @@ class V1::ProductsControllerTest < ActionController::TestCase
     end
 
     get :index, format: :json
-    product_response = json_response
-    assert_equal Product.all.count, product_response[:products].count
+    products_response = json_response[:products]
+    assert_equal Product.all.count, products_response.count
+    products_response.each do |product_response|
+      assert product_response[:user].present?
+    end
   end
 
   # POST
