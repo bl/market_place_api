@@ -10,7 +10,7 @@ class V1::ProductsControllerTest < ActionController::TestCase
 
   test "show returns the information of a product" do
     get :show, id: @product, format: :json
-    product_response = json_response
+    product_response = json_response[:product]
     assert_equal @product.title, product_response[:title]
 
     assert_response 200
@@ -65,8 +65,7 @@ class V1::ProductsControllerTest < ActionController::TestCase
     assert_difference 'user.products.count', 1 do
       post :create, { user_id: user.id,  product: product_attributes }, format: :json
     end
-    product_response  = json_response
-    assert_nil product_response[:errors]
+    product_response  = json_response[:product]
     assert_equal product_attributes[:title], product_response[:title]
 
     assert_response 201
@@ -123,8 +122,7 @@ class V1::ProductsControllerTest < ActionController::TestCase
     log_in_as user
     product_attributes = { title: "New Product Title", price: 49.99 }
     post :update, { user_id: user, id: product, product: product_attributes }, format: :json
-    product_response = json_response
-    assert_nil product_response[:errors]
+    product_response = json_response[:product]
     assert_equal product_attributes[:title], product_response[:title]
 
     assert_response 200
