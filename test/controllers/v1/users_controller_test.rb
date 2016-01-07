@@ -12,11 +12,22 @@ class V1::UsersControllerTest < ActionController::TestCase
 
   # GET
 
-  test "returns information about a reporter on a hash" do
+  test "returns user json on valid user id" do
     get :show, id: @user, format: :json
-    user_response = json_response[:user]
-    assert_equal @user.email, user_response[:email]
-    # assert_equal 200, response.status
+    user_response = json_response[:data]
+    assert_equal @user.email, user_response[:attributes][:email]
+    assert_response 200
+  end
+
+  test "returns product ids with valid user" do
+    user = FactoryGirl.create :user_with_products
+    get :show, id: user, format: :json
+    user_response = json_response[:data]
+    assert_not_nil user_response
+    user_products = user_response[:relationships][:products][:data]
+    user_products.each do |product|
+      assert user.product_ids.include? product[:id].to_i
+    end
     assert_response 200
   end
 
@@ -84,9 +95,9 @@ class V1::UsersControllerTest < ActionController::TestCase
     log_in_as @user
     update_user = { email: "new@example.com" }
     patch :update, { id: @user, user: update_user } , format: :json
-    user_response = json_response[:user]
-    assert_not_nil user_response[:email]
-    assert_equal "new@example.com", user_response[:email].to_s
+    user_response = json_response[:data]
+    assert_not_nil user_response
+    assert_equal "new@example.com", user_response[:attributes][:email].to_s
 
     assert_response 200
   end

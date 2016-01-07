@@ -8,20 +8,13 @@ class V1::ProductsControllerTest < ActionController::TestCase
 
   # GET
 
-  test "show returns the information of a product" do
+  test "show returns the information of a product and associated user id" do
     get :show, id: @product, format: :json
-    product_response = json_response[:product]
-    assert_equal @product.title, product_response[:title]
-
-    assert_response 200
-  end
-
-  test "product json response also contains user" do
-    get :show, id: @product, format: :json
-    product_response = json_response[:product]
-    product_user = product_response[:user]
-    assert_not_nil product_user
-    assert_equal @product.user.id, product_user[:id]
+    product_response = json_response[:data]
+    assert_not_nil product_response
+    assert_equal @product.title, product_response[:attributes][:title]
+    product_user = product_response[:relationships][:user][:data]
+    assert_equal @product.user.id, product_user[:id].to_i
 
     assert_response 200
   end
@@ -34,10 +27,21 @@ class V1::ProductsControllerTest < ActionController::TestCase
     end
 
     get :index, format: :json
-    products_response = json_response[:products]
+    products_response = json_response[:data]
+    assert_not_nil products_response
     assert_equal Product.all.count, products_response.count
+  end
+
+  test "index of product ids returns information for just those products" do
+    user = FactoryGirl.create :user_with_products
+    # create additional products
+    other_user = FactoryGirl.create :user_with_products
+    get :index, { product_ids: user.product_ids }, format: :json
+    products_response = json_response[:data]
+    assert_not_nil products_response
+    assert_equal user.products.count, products_response.count
     products_response.each do |product_response|
-      assert product_response[:user].present?
+      assert user.product_ids.include? product_response[:id].to_i
     end
   end
 
@@ -78,8 +82,9 @@ class V1::ProductsControllerTest < ActionController::TestCase
     assert_difference 'user.products.count', 1 do
       post :create, { user_id: user.id,  product: product_attributes }, format: :json
     end
-    product_response  = json_response[:product]
-    assert_equal product_attributes[:title], product_response[:title]
+    product_response  = json_response[:data]
+    assert_not_nil product_response
+    assert_equal product_attributes[:title], product_response[:attributes][:title]
 
     assert_response 201
   end
@@ -135,8 +140,9 @@ class V1::ProductsControllerTest < ActionController::TestCase
     log_in_as user
     product_attributes = { title: "New Product Title", price: 49.99 }
     post :update, { user_id: user, id: product, product: product_attributes }, format: :json
-    product_response = json_response[:product]
-    assert_equal product_attributes[:title], product_response[:title]
+    product_response = json_response[:data]
+    assert_not_nil product_response
+    assert_equal product_attributes[:title], product_response[:attributes][:title]
 
     assert_response 200
   end

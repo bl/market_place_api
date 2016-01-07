@@ -11,7 +11,8 @@ class V1::ProductsController < ApplicationController
   end
 
   def index
-    @products = Product.all
+    @products = params[:product_ids].present? ? Product.find(params[:product_ids]) : 
+                                                Product.all
     render json: @products
   end
 

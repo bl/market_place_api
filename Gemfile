@@ -26,7 +26,7 @@ gem 'bcrypt', '~> 3.1'
 # rails api framework
 gem 'rails-api', '~> 0.4'
 # Use ActiveModel::Serializers to serialize ActiveModel/ActiveRecord objects
-gem 'active_model_serializers'
+gem 'active_model_serializers', git: 'https://github.com/rails-api/active_model_serializers.git'
 # 
 gem 'responders', '~> 2.0'
 # Use Unicorn as the app server

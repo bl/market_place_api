@@ -33,10 +33,12 @@ class V1::SessionsControllerTest < ActionController::TestCase
   test "should return user record corresponding to given credentials" do
     credentials = { email: @user.email, password: 'foobar' }
     post :create, session: credentials, format: :json 
-    user_response = json_response[:user]
-    assert_equal @user.email,       user_response[:email]
+    user_response = json_response[:data]
+    assert_not_nil user_response
+    user_attributes = user_response[:attributes]
+    assert_equal @user.email,       user_attributes[:email]
     assert @user.authenticated? :password, credentials[:password]
-    assert_equal @user.reload.auth_token,  user_response[:auth_token]
+    assert_equal @user.reload.auth_token,  user_attributes[:auth_token]
 
     assert_response 200
   end
