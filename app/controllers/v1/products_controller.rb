@@ -11,13 +11,11 @@ class V1::ProductsController < ApplicationController
   end
 
   def index
-    @products = params[:product_ids].present? ? Product.find(params[:product_ids]) : 
-                                                Product.all
+    @products = Product.search(params)
     render json: @products
   end
 
   def create
-    #@user = User.find params[:user_id]
     @product = @user.products.build(product_params)
     if @product.save
       render json: @product, status: 201
